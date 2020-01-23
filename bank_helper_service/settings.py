@@ -58,13 +58,21 @@ WSGI_APPLICATION = 'bank_helper_service.wsgi.application'
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'bank_db',
+    #     'USER': 'arun',
+    #     'PASSWORD': 'root',
+    #     'HOST': 'localhost',
+    #     'PORT': '5433',
+    # },
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'bank_db',
-        'USER': 'arun',
-        'PASSWORD': 'root',
-        'HOST': 'localhost',
-        'PORT': '5433',
+        'NAME': 'bc6cwzblailtbkwnhdcr',
+        'USER': 'u1jcborgzdoq1ggwuk4n',
+        'PASSWORD': 'UueBjaMTN2J4GCvfJj8e',
+        'HOST': 'bc6cwzblailtbkwnhdcr-postgresql.services.clever-cloud.com',
+        'PORT': '5432',
     }
 }
 
