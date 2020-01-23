@@ -24,7 +24,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['young-fjord-67159.herokuapp.com','0.0.0.0', 'localhost']
 
 
 # Application definition
