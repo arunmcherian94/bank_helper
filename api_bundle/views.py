@@ -18,15 +18,21 @@ def autocomplete(request):
     """ Autocomplete """
     try:
         if request.method == "GET":
-            limit = request.GET.get('limit', 0)
-            offset = request.GET.get('offset', 0)
+            try:
+                limit = int(request.GET.get('limit', 1))
+                offset = int(request.GET.get('offset', 0))
+            except Exception as err:
+                return JsonResponse({'status':'Error','message': 'Limit and Offset parameters have to be numeric'}, status=400)
             # TODO: Appropriate input validations
             if limit < 0 or offset < 0:
                 return JsonResponse({'status':'Error','message': 'Limit/Offset values have to be more than 0'}, status=400)
             search_query = request.GET.get('q', '')
-            get_branches_query = "SELECT * FROM branches WHERE branch ILIKE '%s%%' ORDER BY ifsc LIMIT %s OFFSET %s"%(search_query,limit,offset)
+            # below query was prone to SQL injection, so using named parameters instead.
+            # get_branches_query = "SELECT * FROM branches WHERE branch ILIKE '%s%%' ORDER BY ifsc LIMIT %s OFFSET %s"%(search_query,limit,offset)
+            get_branches_query = "SELECT * FROM branches WHERE branch ILIKE %(search_query)s ORDER BY ifsc LIMIT %(limit)s OFFSET %(offset)s"
+            query_replacements = {'search_query': search_query+'%', 'offset': offset, 'limit': limit}
             response = {"branches":[]}
-            db_obj = DB_helper('bank_db',get_branches_query)
+            db_obj = DB_helper('bank_db',get_branches_query, query_replacements)
             response["branches"] = db_obj.execute()
             return JsonResponse({'status':'Success','message': response}, status=200)
         else:
@@ -42,19 +48,22 @@ def branch_search(request):
     """
     try:
         if request.method == "GET":
-            limit = request.GET.get('limit', 0)
-            offset = request.GET.get('offset', 0)
+            try:
+                limit = int(request.GET.get('limit', 1))
+                offset = int(request.GET.get('offset', 0))
+            except Exception as err:
+                return JsonResponse({'status':'Error','message': 'Limit and Offset parameters have to be numeric'}, status=400)
             # TODO: Appropriate input validations
             if limit < 0 or offset < 0:
                 return JsonResponse({'status':'Error','message': 'Limit/Offset values have to be more than 0'}, status=400)
             search_query = request.GET.get('q', '')
-            hacky_where_clause = "ifsc ILIKE '%s%%' OR branch ILIKE '%s%%' OR address ILIKE '%s%%' \
-OR city ILIKE '%s%%' OR district ILIKE '%s%%' OR state ILIKE '%s%%'" % (search_query,search_query,search_query,
-                search_query,search_query,search_query)
-            # print hacky_where_clause
-            get_branches_query = "SELECT * FROM branches WHERE %s ORDER BY ifsc LIMIT %s OFFSET %s"%(hacky_where_clause,limit,offset)
+            # below query was prone to SQL injection, so using named parameters instead.
+            # get_branches_query = "SELECT * FROM branches WHERE %s ORDER BY ifsc LIMIT %s OFFSET %s"%(hacky_where_clause,limit,offset)
+            get_branches_query = """SELECT * FROM branches WHERE ifsc ILIKE %(search_query)s OR branch ILIKE %(search_query)s
+             OR address ILIKE %(search_query)s ORDER BY ifsc LIMIT %(limit)s OFFSET %(offset)s"""
+            query_replacements = {'search_query': search_query+'%', 'offset': offset, 'limit': limit}
             response = {"branches":[]}
-            db_obj = DB_helper('bank_db',get_branches_query)
+            db_obj = DB_helper('bank_db', get_branches_query, query_replacements)
             response["branches"] = db_obj.execute()
             return JsonResponse({'status':'Success','message': response}, status=200)
         else:
